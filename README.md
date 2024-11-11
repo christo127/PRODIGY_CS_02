@@ -1,3 +1,4 @@
+
 # Pixel Manipulation for Image Encryption
 
 ### Project Overview
@@ -36,101 +37,6 @@ Through this project, I’ve gained valuable experience in implementing cryptogr
 ### Conclusion
 
 This project serves as an engaging introduction to image encryption techniques in Python. It underscores the importance of encryption in safeguarding sensitive data and demonstrates how simple algorithms can be applied to enhance data security effectively.
-from PIL import Image
-import numpy as np
-
-def load_image(image_path):
-    """Load an image and return it as a NumPy array."""
-    img = Image.open(image_path)
-    return np.array(img)
-
-def save_image(array, output_path):
-    """Save a NumPy array as an image."""
-    img = Image.fromarray(array)
-    img.save(output_path)
-
-def generate_key(shape):
-    """Generate a random key with the specified shape."""
-    return np.random.randint(0, 256, size=shape, dtype=np.uint8)
-
-def xor_image(array, key):
-    """Apply XOR operation on the image array using the key."""
-    key_resized = np.resize(key, array.shape)
-    return np.bitwise_xor(array, key_resized)
-
-def pixel_swap(array):
-    """Swap pixel values in pairs for added encryption."""
-    swapped_array = array.copy()
-    for i in range(0, array.shape[0] - 1, 2):
-        for j in range(0, array.shape[1] - 1, 2):
-            # Swap adjacent pixels
-            swapped_array[i, j], swapped_array[i+1, j+1] = swapped_array[i+1, j+1], swapped_array[i, j]
-    return swapped_array
-
-def math_operation(array, offset=50):
-    """Apply a mathematical operation on the image for encryption."""
-    return (array + offset) % 256
-
-def encrypt_image(image_path, key_path="encrypted_image.png", method="xor", swap=False, offset=50):
-    """Encrypt an image with specified method and options, and save the encrypted image."""
-    img_array = load_image(image_path)
-    key = generate_key(img_array.shape)
-
-    # Choose encryption method
-    if method == "xor":
-        encrypted_array = xor_image(img_array, key)
-    elif method == "math":
-        encrypted_array = math_operation(img_array, offset)
-    else:
-        raise ValueError("Unknown encryption method")
-
-    # Apply optional pixel swap for added security
-    if swap:
-        encrypted_array = pixel_swap(encrypted_array)
-
-    save_image(encrypted_array, key_path)
-    print(f"Image encrypted successfully and saved as {key_path}.")
-    return key
-
-def decrypt_image(encrypted_image_path, key, output_path="decrypted_image.png", method="xor", swap=False, offset=50):
-    """Decrypt an encrypted image using the chosen method and save the decrypted image."""
-    encrypted_array = load_image(encrypted_image_path)
-
-    # Reverse pixel swapping if used during encryption
-    if swap:
-        encrypted_array = pixel_swap(encrypted_array)
-
-    # Choose decryption method
-    if method == "xor":
-        decrypted_array = xor_image(encrypted_array, key)
-    elif method == "math":
-        decrypted_array = (encrypted_array - offset) % 256
-    else:
-        raise ValueError("Unknown decryption method")
-
-    save_image(decrypted_array, output_path)
-    print(f"Image decrypted successfully and saved as {output_path}.")
-
-def main():
-    print("Image Encryption and Decryption Tool with Pixel Manipulation")
-
-    # Get the image path from the user
-    image_path = input("Enter the path to the image file: ")
-
-    # Choose encryption method
-    method = input("Choose encryption method (xor/math): ").strip().lower()
-    swap = input("Apply pixel swapping? (y/n): ").strip().lower() == 'y'
-    offset = int(input("Enter an offset value for math operation (default 50): ").strip() or 50)
-
-    # Encrypt the image
-    key = encrypt_image(image_path, method=method, swap=swap, offset=offset)
-
-    # Decrypt the image
-    decrypt_image("encrypted_image.png", key, method=method, swap=swap, offset=offset)
-
-if __name__ == "__main__":
-    main()
-
 
 ### Code
 
